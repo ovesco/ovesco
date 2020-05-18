@@ -2,12 +2,14 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import Persist from 'vuex-persist';
 
-// This is to allow jest tests to pass
-const window = window || { localStorage: null };
+const plugins = [];
 
-const LocalPersist = new Persist({
-    storage: window.localStorage,
-});
+if (typeof process === 'undefined') {
+    const LocalPersist = new Persist({
+        storage: window.localStorage,
+    });
+    plugins.push(LocalPersist.plugin);
+}
 
 export const state = {
     favorites: [],
@@ -28,7 +30,7 @@ export const getters = {
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-    plugins: [LocalPersist.plugin],
+    plugins,
     state,
     mutations,
     getters

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Migrating emails from a server to another | Guillaume Hochet</title>
+    <meta name="generator" content="VuePress 1.4.1">
+    
+    <meta name="description" content="">
+    <link rel="preload" href="/assets/css/0.styles.bd7c47e7.css" as="style"><link rel="preload" href="/assets/js/app.bb737b65.js" as="script"><link rel="preload" href="/assets/js/2.420ec4fb.js" as="script"><link rel="preload" href="/assets/js/11.da020f81.js" as="script"><link rel="prefetch" href="/assets/js/10.297101c7.js"><link rel="prefetch" href="/assets/js/12.03a40be4.js"><link rel="prefetch" href="/assets/js/13.2e5216a7.js"><link rel="prefetch" href="/assets/js/3.32530dd2.js"><link rel="prefetch" href="/assets/js/4.f8dc23d6.js"><link rel="prefetch" href="/assets/js/5.cf436b8e.js"><link rel="prefetch" href="/assets/js/6.a52816dd.js"><link rel="prefetch" href="/assets/js/7.27d7ddd2.js"><link rel="prefetch" href="/assets/js/8.16ec4366.js"><link rel="prefetch" href="/assets/js/9.f2d583e5.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.bd7c47e7.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container no-sidebar"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">Guillaume Hochet</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <!----></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><!---->  <!----> </aside> <main class="page"> <div class="theme-default-content content__default"><h1 id="migrating-emails-from-a-server-to-another"><a href="#migrating-emails-from-a-server-to-another" class="header-anchor">#</a> Migrating emails from a server to another</h1> <p>I was managing the mail server for my local scouting group and we have
+approximately a hundred email addresses each with a dedicated space with up
+to 2Go of emails. Leaving the group I wished to switch and use the services
+of a professional email provider rather than staying on our small server.</p> <h2 id="the-cost-of-migrating-mails"><a href="#the-cost-of-migrating-mails" class="header-anchor">#</a> The cost of migrating mails</h2> <p>The problem was about migrating these mailboxes along with email accounts. Multiple
+companies offer services to migrate emails from a server to another, but it can cost
+a lot, and even 500$ is not a small price to pay for a scouting group. I had to find
+another solution, for example using open source softwares or building my own.
+Surprisingly I didn't find any free solution that would do what I needed, so I decided
+to develop a set of scripts to help me do it.</p> <h2 id="before-migrating"><a href="#before-migrating" class="header-anchor">#</a> Before migrating</h2> <p>Migrating an email address from a server to another requires a few points to be fullfilled:</p> <ul><li>First you need to know the host and port of the old server and destination server</li> <li>You need to know the origin email address as well as destination email address. In my case
+it was a 1:1 mapping, so I first had to replicate all migrated addresses</li> <li>You need to know the password of the origin email address as well as the password of the
+destination one, required to perform read and write operations on both of them</li></ul> <div class="custom-block warning"><p class="custom-block-title">Accessing both servers</p> <p>Please note that both mail servers should be adressables independently of any DNS issue. For
+example in my case, the MX record of my domain name was mapped to the old server, but the email
+provider of the new one has his own.</p></div> <h2 id="migrating-emails"><a href="#migrating-emails" class="header-anchor">#</a> Migrating emails</h2> <p>In order to migrate emails we have to know which tools and protocols we can use.</p> <h3 id="what-should-the-script-do"><a href="#what-should-the-script-do" class="header-anchor">#</a> What should the script do</h3> <p>In order to work the script should be able to:</p> <ol><li>Manage mailboxes on both servers</li> <li>Read emails from the old server</li> <li>Write emails on the destination server
+We actually don't need anything else, that's enough to migrate emails.</li></ol> <h3 id="imap"><a href="#imap" class="header-anchor">#</a> IMAP</h3> <p>The Internet Message Access Protocol is responsible to allow access to emails stored on mail servers.
+It is used by every webmail and email software to list your emails, show their content, download their
+attached items and so on. It's one of the two protocols required to use emails along with SMTP
+(simple mail transfer protocol) which is used to transfer and deliver emails.</p> <div class="custom-block tip"><p class="custom-block-title">The POP protocol</p> <p>There actually exist two protocols to read emails, SMTP and POP. Today SMTP is mostly used, the main
+difference between the two of them is that SMTP allows you to read emails remotely, they stay on the
+server, while POP will download them on your client, making it impossible to check emails from
+your phone and your computer for example.</p></div> <h3 id="what-s-a-mailbox"><a href="#what-s-a-mailbox" class="header-anchor">#</a> What's a mailbox</h3> <p>You probably already created &quot;folders&quot; in your webmail, move some mails in them and even create
+special rules so that when an email arrives, if its subject contains &quot;newsletter X&quot; move it to Spam. Those
+folders are actually part of the IMAP protocol and emails are (virtually) stored in them. When you
+connect to a mail server using IMAP, you have to <em>open</em> a mailbox to read and write emails in it.</p> <h4 id="children-mailbox"><a href="#children-mailbox" class="header-anchor">#</a> Children mailbox</h4> <p>You also have the possibility to have children mailboxes in a given mailbox. They can
+be accessed using paths, for example <code>INBOX/my-custom-box/another-subbox</code>, but note that the separator
+(here the <code>/</code> character) can be different from a mail server to another.</p> <h2 id="building-the-script"><a href="#building-the-script" class="header-anchor">#</a> Building the script</h2> <p>To help me migrate my email addresses I developed a small script in Javascript which is detailed
+here.</p> <h3 id="writing-a-small-imap-client"><a href="#writing-a-small-imap-client" class="header-anchor">#</a> Writing a small IMAP client</h3> <p>I wrote a small IMAP client class to help me building my script which allowed me to promisify multiple
+operations offered by the underlying low level client. I used <a href="https://www.npmjs.com/package/imap" target="_blank" rel="noopener noreferrer">the imap package<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a>
+as base client and built upon it. The code of the client is <a href="https://gist.github.com/ovesco/10a31ef37be5d69b09314c3c33a9a40d#file-imapclient-js" target="_blank" rel="noopener noreferrer">available here<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a>
+if you want to check it, but as it's not required for the comprehension of this post I won't detail it here.</p> <h3 id="connecting-to-both-servers"><a href="#connecting-to-both-servers" class="header-anchor">#</a> Connecting to both servers</h3> <p>The first step we have to do is connect to both the old and the new mail servers.</p> <div class="language-javascript extra-class"><pre class="language-javascript"><code><span class="token comment">// The small client detailed in the previous point</span>
+<span class="token keyword">const</span> client <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'./client'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Main async block, all code detailed after is located in it</span>
+<span class="token punctuation">(</span><span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> fromClient <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Client</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        user<span class="token operator">:</span> <span class="token string">'email@address.com'</span><span class="token punctuation">,</span>
+        password<span class="token operator">:</span> <span class="token string">'potatoes'</span><span class="token punctuation">,</span>
+        host<span class="token operator">:</span> <span class="token string">'my.old.email-server.host'</span><span class="token punctuation">,</span> <span class="token comment">// IMAP host</span>
+        port<span class="token operator">:</span> <span class="token number">143</span> <span class="token comment">// IMAP port</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">const</span> destinationClient <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Client</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        user<span class="token operator">:</span> <span class="token string">'email@address.com'</span><span class="token punctuation">,</span>
+        password<span class="token operator">:</span> <span class="token string">'potatoes'</span><span class="token punctuation">,</span>
+        host<span class="token operator">:</span> <span class="token string">'my.NEW.email-server.host'</span><span class="token punctuation">,</span> <span class="token comment">// IMAP host</span>
+        port<span class="token operator">:</span> <span class="token number">143</span> <span class="token comment">// IMAP port</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">try</span> <span class="token punctuation">{</span>
+        <span class="token keyword">await</span> fromClient<span class="token punctuation">.</span><span class="token function">connect</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">await</span> destinationClient<span class="token punctuation">.</span><span class="token function">connect</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span>e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        console<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div><h3 id="checking-if-all-required-mailboxes-exist-on-both-servers"><a href="#checking-if-all-required-mailboxes-exist-on-both-servers" class="header-anchor">#</a> Checking if all required mailboxes exist on both servers</h3> <p>To migrate mails we have to know all the mailboxes that exist on the old server,
+and in which mailbox to write on the destination server. In my case, for each mailbox
+on the old server I created a same one on the destination one if it didn't exist.</p> <div class="custom-block tip"><p class="custom-block-title">default mailboxes</p> <p>Some mailboxes are available by default, among them we can find the INBOX and TRASH ones.</p></div> <div class="language-javascript extra-class"><pre class="language-javascript"><code><span class="token comment">// Mailboxes on the old server</span>
+<span class="token keyword">const</span> allFromBoxs <span class="token operator">=</span> <span class="token keyword">await</span> fromClient<span class="token punctuation">.</span><span class="token function">getBoxes</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Existing mailboxes on the new server</span>
+<span class="token keyword">const</span> allDestBoxs <span class="token operator">=</span> <span class="token keyword">await</span> destinationClient<span class="token punctuation">.</span><span class="token function">getBoxes</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// This will list all mailboxes that exist on the old server but not on the new server,</span>
+<span class="token comment">// including child ones</span>
+<span class="token keyword">const</span> boxToCreate <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+<span class="token comment">// This will list all mailboxes to migrate, with a mapping from the old server</span>
+<span class="token comment">// mailbox to the destination server one, with respect for children mailboxes, </span>
+<span class="token comment">// path and separator. In my case I only migrated the inbox, sent messages and </span>
+<span class="token comment">// drafts. The script will populate this object with all additional children </span>
+<span class="token comment">// mailbox from currently listed ones.</span>
+<span class="token keyword">const</span> migratedMailboxes <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token constant">INBOX</span><span class="token operator">:</span> <span class="token string">'INBOX'</span><span class="token punctuation">,</span>
+    Drafts<span class="token operator">:</span> <span class="token string">'Drafts'</span><span class="token punctuation">,</span>
+    Sent<span class="token operator">:</span> <span class="token string">'Sent'</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment">/**
+ * Recursive function to explore all children mailboxes of given one
+ * @param fromBox object which contains the old server mailbox children and delimiter
+ * @param fromPath mailbox path on the old server
+ * @param destPath current path on the destination server
+ * @param destDelimiter mailbox path delimiter on the destination server
+ */</span>
+<span class="token keyword">const</span> <span class="token function-variable function">explore</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token parameter">fromBox<span class="token punctuation">,</span> fromPath<span class="token punctuation">,</span> destPath<span class="token punctuation">,</span> destDelimiter</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+
+    <span class="token comment">// Check if there's children to scan</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>fromBox<span class="token punctuation">.</span>children <span class="token operator">!==</span> <span class="token keyword">undefined</span> <span class="token operator">&amp;&amp;</span> fromBox<span class="token punctuation">.</span>children <span class="token operator">!==</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+        <span class="token comment">// Iterate on each child mailbox, giving us its name and mailbox object</span>
+        Object<span class="token punctuation">.</span><span class="token function">keys</span><span class="token punctuation">(</span>fromBox<span class="token punctuation">.</span>children<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">childBoxName</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+            <span class="token keyword">const</span> childBox <span class="token operator">=</span> fromBox<span class="token punctuation">.</span>children<span class="token punctuation">[</span>childBoxName<span class="token punctuation">]</span><span class="token punctuation">;</span>
+            
+            <span class="token comment">// build oldServer mailbox path</span>
+            <span class="token keyword">const</span> oldPath <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>fromPath<span class="token interpolation-punctuation punctuation">}</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>fromBox<span class="token punctuation">.</span>delimiter<span class="token interpolation-punctuation punctuation">}</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>childBoxName<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+
+            <span class="token comment">// build destination server mailbox path</span>
+            <span class="token keyword">const</span> destinationPath <span class="token operator">=</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>destPath<span class="token interpolation-punctuation punctuation">}</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>destDelimiter<span class="token interpolation-punctuation punctuation">}</span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>childBoxName<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+
+            <span class="token comment">// Add mailbox path to mailbox to create on destination server</span>
+            boxToCreate<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>destinationPath<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            <span class="token comment">// add mailbox path to mailbox to migrate</span>
+            migratedMailboxes<span class="token punctuation">[</span>oldPath<span class="token punctuation">]</span> <span class="token operator">=</span> destinationPath<span class="token punctuation">;</span>
+
+            <span class="token comment">// Keep on children exploration</span>
+            <span class="token function">explore</span><span class="token punctuation">(</span>childBox<span class="token punctuation">,</span> oldPath<span class="token punctuation">,</span> destinationPath<span class="token punctuation">,</span> destDelimiter<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Start exploration of children mailbox</span>
+Object<span class="token punctuation">.</span><span class="token function">keys</span><span class="token punctuation">(</span>migratedMailboxes<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">fromBoxName</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+
+    <span class="token comment">// Retrieve delimiter for given mailbox on destination server</span>
+    <span class="token keyword">const</span> delimiter <span class="token operator">=</span> allDestBoxs<span class="token punctuation">[</span>migratedMailboxes<span class="token punctuation">[</span>fromBoxName<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">.</span>delimiter<span class="token punctuation">;</span>
+
+    <span class="token comment">// Explore this mailbox</span>
+    <span class="token function">explore</span><span class="token punctuation">(</span>allFromBoxs<span class="token punctuation">[</span>fromBoxName<span class="token punctuation">]</span><span class="token punctuation">,</span> fromBoxName<span class="token punctuation">,</span>
+        migratedMailboxes<span class="token punctuation">[</span>fromBoxName<span class="token punctuation">]</span><span class="token punctuation">,</span> delimiter<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div><p>This piece of code can appear complex but it's not in reality. All it does is</p> <ul><li>list all mailboxes on the old server</li> <li>list all mailboxes on the new server</li> <li>take the list of initial mailboxes to migrate (in <code>migratedMailboxes</code>) and
+start looking for eventual children mailboxes in each of them</li></ul> <h3 id="creating-missing-mailboxes-on-destination-server"><a href="#creating-missing-mailboxes-on-destination-server" class="header-anchor">#</a> Creating missing mailboxes on destination server</h3> <p>Once we have the list of mailboxes that are missing from the destination server,
+we can start creating them.</p> <div class="language-javascript extra-class"><pre class="language-javascript"><code><span class="token comment">// Create all missing mailboxes on destination server</span>
+<span class="token keyword">await</span> boxToCreate<span class="token punctuation">.</span><span class="token function">reduce</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">acc<span class="token punctuation">,</span> nextBoxToCreate</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span>
+    acc<span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token keyword">new</span> <span class="token class-name">Promise</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">resolve</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+        destinationClient<span class="token punctuation">.</span><span class="token function">addBox</span><span class="token punctuation">(</span>nextBoxToCreate<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+
+            <span class="token comment">// Don't forget to subscribe to the newly created mailbox,</span>
+            <span class="token comment">// otherwise it won't be readable from any client</span>
+            destinationClient<span class="token punctuation">.</span><span class="token function">suscribeBox</span><span class="token punctuation">(</span>nextBoxToCreate<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+                console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Suscribed to '</span> <span class="token operator">+</span> nextBoxToCreate<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token function">resolve</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+Promise<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div><div class="custom-block tip"><p class="custom-block-title">Performing async tasks in order</p> <p>Please note the usage of the <code>await boxToCreate.reduce(...)</code> with <code>Promise.resolve()</code> given to
+the reduce function which allows us to perform a set of async tasks one after the other, waiting
+for the previous one every time.</p></div> <h3 id="performing-migration-of-each-mailbox-one"><a href="#performing-migration-of-each-mailbox-one" class="header-anchor">#</a> Performing migration of each mailbox one</h3> <p>Once all required mailboxes are created we can start iterating over them.</p> <div class="language-javascript extra-class"><div class="highlight-lines"><br><br><br><br><br><br><br><div class="highlighted"> </div><div class="highlighted"> </div><div class="highlighted"> </div><br><br><br><br><br><br><br></div><pre class="language-javascript"><code><span class="token comment">// Iterate over each mailbox to migrate</span>
+Object<span class="token punctuation">.</span><span class="token function">keys</span><span class="token punctuation">(</span>migratedMailboxes<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">reduce</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">acc<span class="token punctuation">,</span> nextBox</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> acc<span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span><span class="token keyword">new</span> <span class="token class-name">Promise</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">resolveMailbox</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token comment">// Open mailbox on destination server client</span>
+    destinationClient<span class="token punctuation">.</span><span class="token function">openBox</span><span class="token punctuation">(</span>migratedMailboxes<span class="token punctuation">[</span>nextBox<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">destinationBox</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+
+        <span class="token comment">// Open mailbox on old server client</span>
+        fromClient<span class="token punctuation">.</span><span class="token function">openBox</span><span class="token punctuation">(</span>nextBox<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">fromBox</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+            <span class="token comment">// Here both clients have opened correct mailboxes</span>
+            <span class="token comment">// All next presented code samples are going here</span>
+            <span class="token comment">// [...]</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> Promise<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    fromClient<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    destinationClient<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div><p>As you can see we're using the <code>reduce</code> along with <code>Promise.resolve()</code> function to iterate over
+each mailbox, migrate it and go on the next once done, one after the other.</p> <h3 id="reading-emails-from-the-mailbox"><a href="#reading-emails-from-the-mailbox" class="header-anchor">#</a> Reading emails from the mailbox</h3> <p>In order to retrieve mails from a mailbox you can perform some search queries on it. I used the
+<code>SINCE January 01, 2000</code> query to retrieve all emails since in 2000 we didn't have any server, I'm sure
+to take all of them.</p></div> <footer class="page-edit"><!----> <!----></footer> <!----> </main></div><div class="global-ui"></div></div>
+    <script src="/assets/js/app.bb737b65.js" defer></script><script src="/assets/js/2.420ec4fb.js" defer></script><script src="/assets/js/11.da020f81.js" defer></script>
+  </body>
+</html>
