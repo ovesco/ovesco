@@ -10,7 +10,7 @@
     "dev": "vuepress dev docs",
     "build": "vuepress build docs",
     "test": "jest",
-    "deploy": "gh-pages -d docs/.vuepress/dist"
+    "deploy": "npm run build && gh-pages -d docs/.vuepress/dist"
   },
   "dependencies": {
     "vuex": "^3.4.0",

@@ -1,8 +1,8 @@
 <template>
     <div>
         <h2>Your watchlist</h2>
-        <div v-if="$store.state.favorites.length === 0">
-            <p>You currently have no favorite article. You can add some
+        <div>
+            <p>You currently have {{ $store.state.favorites.length }} favorite article. You can add some
             by clicking the <i>&hearts;</i> button on an article</p>
         </div>
         <ul>

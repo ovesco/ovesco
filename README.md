@@ -3,6 +3,8 @@
 This project was developed for the Softweng MSE master at HES-SO. It's a small blog with, currently, only
 one article about ternary search trees, but some other are on the road!
 
+You can [check it out here!](https://softweng.guillaumehochet.now.sh/)
+
 ## Technologies
 The purpose of the project was to familiarize with frontend framework technologies like Vue/React or other.
 I chose to go on using Vuepress to build the blog. As such, we use:
@@ -31,3 +33,14 @@ for Vuex.
 Vuepress is quite tough to get started with. Theming is complex and extending an existing theme is more
 complex than it seems. Loading external libraries like Vuex is also troublesome and doesn't follow the
 standard registration flow. But all in all it was a nice experiment.
+
+### Making vuex persist work with SSR
+Vuepress couldn't build the project because we're using `window.localStorage` in the store to persist it
+automatically. In order for everything to work, after a bit of digging, I ended up with the following
+solution:
+```js
+if (typeof process === 'undefined') {
+    // We're in browser!
+}
+```
+This also allows us to run jest tests without problems.
