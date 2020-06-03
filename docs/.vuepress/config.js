@@ -1,3 +1,3 @@
 module.exports = {
-    title: 'Ovesco\'s blog',
+    title: 'Guigui\'s blog',
 }
