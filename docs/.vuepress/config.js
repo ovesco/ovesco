@@ -1,4 +1,3 @@
 module.exports = {
-    base: "/softweng",
-    title: 'Guillaume Hochet',
+    title: 'Ovesco\'s blog',
 }
