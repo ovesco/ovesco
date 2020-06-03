@@ -1,4 +1,10 @@
-# Lazy proxy in typescript
+---
+title: Lazy proxy in typescript
+---
+
+<ToggleFavorite />
+
+# Lazy proxy in Typescript
 
 Proxy in itself is a structural design pattern where your object
 is hidden behind a *proxy* object which controls how you interact with it.
