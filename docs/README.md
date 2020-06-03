@@ -1,6 +1,9 @@
-# Welcome
-This is my personal blog, I'll put stuff I discover and experiment with that I think could be of interest.
-Originally this was developed as a project for my SoftwEng MSE Master course at HES-SO Switzerland.
+# Hi.
+
+I'm Guillaume, a developer from Switzerland. My fields of interest are mainly web, big data and data structures.
+
+This is my personal blog, I'll put stuff I discover and experiment with that I find interesting.
+This was originally developed as a project for my SoftwEng MSE Master course at HES-SO Switzerland.
 
 <Favorites />
 
