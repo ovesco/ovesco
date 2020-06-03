@@ -365,6 +365,4 @@ console.log(tree.print());
 ```
 
 ## Conclusion
-In this post we saw a simple implementation of a ternary search tree in Typescript.
-I hope this helped you understand how this data structure works and how you
-can use it in your code!
+And there we are with ternary search trees!

@@ -127,5 +127,4 @@ console.log(lazyObject.hello); // lazy world
 ```
 
 ## Conclusion
-That was a funky experiment on how to interact with Proxies and discover another nice
-way of using them.
+And there we are with lazy proxies!
