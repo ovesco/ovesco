@@ -16,7 +16,9 @@ You can find me on [Github](https://github.com/ovesco).
 </ul>
 
 ## Projects
-Here is some of the stuff I build.
+Here is some of the stuff I built.
 <ul>
-    <li><a to="https://github.com/ovesco/diosaur" target="_blank">Diosaur - Dependency injection for Node and Deno</a></li>
+    <li><a href="https://github.com/ovesco/diosaur" target="_blank">Diosaur - Dependency injection for Node and Deno</a></li>
+    <li><a href="https://ovesco.github.io/scribio/" target="_blank">Scribio - An inline edition solution</a></li>
+    <li><a href="https://github.com/ovesco/vue-dynamic-style" target="_blank">Vue-dynamic-style - A Vue 2. plugin for dynamic styling in components</a></li>
 </ul>
