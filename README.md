@@ -3,7 +3,7 @@
 This project was developed for the Softweng MSE master at HES-SO. It's a small blog with, currently, only
 one article about ternary search trees, but some other are on the road!
 
-You can [check it out here!](https://softweng.guillaumehochet.now.sh/)
+You can [check it out here!](https://guigui.ch/)
 
 ## Technologies
 The purpose of the project was to familiarize with frontend framework technologies like Vue/React or other.
