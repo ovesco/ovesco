@@ -13,8 +13,7 @@ This allows you to perform some additional stuff before forwarding the
 
 ## Proxies in javascript/typescript
 ::: tip
-I'll speak about Typescript here but the behaviour is exactly the same as
-in Javascript as you could guess.
+I'll speak about Typescript here but the behaviour is exactly the same for Javascript as you could guess.
 :::
 
 In typescript, a Proxy object is actually implemented and documented, you can
@@ -64,9 +63,7 @@ My use case is that I'm developping a small dependency injection container, and 
 *might* not exist when I want to inject them. But instead, if I inject a LazyProxy which will resolve
 the service it's proxyfying and act like it once it's available, then it's a win.
 
-## My solution
-I think this solution is a little bit *hacky* and don't hesitate if you know anything better but it
-works well.
+## Possible solution
 
 ```typescript
 class LazyProxy {
@@ -90,7 +87,7 @@ class LazyProxy {
 
     private get instance() {
         if (this._instance === null) {
-            this._instance = this.provider(); // Load the service
+            this._instance = this.provider(); // Load the service and keep it in cache
         }
         return this._instance;
     }
@@ -103,8 +100,8 @@ that the returned value from `new LazyProxy(...)` will actually be the proxy I c
 in it, but keeping track of the LazyProxy scope through the `self` variable, necessary
 to resolve the correct service in `get instance()`.
 
-The LazyProxy class then is simply used to define the scope of execution of the returned
-proxy and making sure it can resolve the correct service.
+This is necessary as explained [here](https://stackoverflow.com/a/37714855/2514387), an ES2015
+class cannot extend from base Proxy class.
 
 This requires the `@ts-ignore` flag or doing a `as any` type conversion, otherwise we're
 messing with it and it will throw a type error.
