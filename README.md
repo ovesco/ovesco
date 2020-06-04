@@ -1,7 +1,6 @@
 # Softweng project
 
-This project was developed for the Softweng MSE master at HES-SO. It's a small blog with, currently, only
-one article about ternary search trees, but some other are on the road!
+This project was developed for the Softweng MSE master at HES-SO. It's a small blog made with Vuepress automatically built with github actions on push.
 
 You can [check it out here!](https://guigui.ch/)
 
