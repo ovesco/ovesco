@@ -17,7 +17,7 @@ I'll speak about Typescript here but the behaviour is exactly the same for Javas
 :::
 
 In typescript, a Proxy object is actually implemented and documented, you can
-find it [here](https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Proxy).
+find it [here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy).
 
 In short, it allows you to set **traps** which will intercept the actions
 you're trying to perform on an object and allows you to do something else. For example:
