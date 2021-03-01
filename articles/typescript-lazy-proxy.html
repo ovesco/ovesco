@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Lazy proxy in typescript | Guigui&#39;s blog</title>
+    <meta name="generator" content="VuePress 1.4.1">
+    
+    <meta name="description" content="">
+    <link rel="preload" href="/assets/css/0.styles.eef4cf48.css" as="style"><link rel="preload" href="/assets/js/app.47846010.js" as="script"><link rel="preload" href="/assets/js/2.4afa1a45.js" as="script"><link rel="preload" href="/assets/js/10.bd030323.js" as="script"><link rel="preload" href="/assets/js/4.74cb3808.js" as="script"><link rel="prefetch" href="/assets/js/11.870b75d9.js"><link rel="prefetch" href="/assets/js/3.00acd3ec.js"><link rel="prefetch" href="/assets/js/5.bca5be9d.js"><link rel="prefetch" href="/assets/js/6.5ab4ca7e.js"><link rel="prefetch" href="/assets/js/7.94c7c201.js"><link rel="prefetch" href="/assets/js/8.ffd73c99.js"><link rel="prefetch" href="/assets/js/9.1389ab11.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.eef4cf48.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container no-sidebar"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><!----> <span class="site-name">Guigui's blog</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <!----></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><!---->  <!----> </aside> <main class="page"> <div class="theme-default-content content__default"><div class="flex-container"><button>
+        ♥
+    </button></div> <h1 id="lazy-proxy-in-typescript"><a href="#lazy-proxy-in-typescript" class="header-anchor">#</a> Lazy proxy in Typescript</h1> <p>Proxy in itself is a structural design pattern where your object
+is hidden behind a <em>proxy</em> object which controls how you interact with it.
+This allows you to perform some additional stuff before forwarding the
+<em>request</em> to the underlying object.</p> <h2 id="proxies-in-javascript-typescript"><a href="#proxies-in-javascript-typescript" class="header-anchor">#</a> Proxies in javascript/typescript</h2> <div class="custom-block tip"><p class="custom-block-title">TIP</p> <p>I'll speak about Typescript here but the behaviour is exactly the same for Javascript as you could guess.</p></div> <p>In typescript, a Proxy object is actually implemented and documented, you can
+find it <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy" target="_blank" rel="noopener noreferrer">here<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a>.</p> <p>In short, it allows you to set <strong>traps</strong> which will intercept the actions
+you're trying to perform on an object and allows you to do something else. For example:</p> <div class="language-typescript extra-class"><pre class="language-typescript"><code><span class="token keyword">const</span> obj <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> proxy <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>obj<span class="token punctuation">,</span> <span class="token punctuation">{</span>
+    <span class="token keyword">get</span><span class="token punctuation">(</span>target<span class="token operator">:</span> <span class="token builtin">any</span><span class="token punctuation">,</span> key<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">// {} yo</span>
+        <span class="token keyword">return</span> <span class="token number">2</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>proxy<span class="token punctuation">.</span>yo<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 2</span>
+</code></pre></div><p>As you can see in the upper example, the proxy will intercept the access to your object
+and allow you to do anything with it. The first parameter is the target, in this case our <code>obj</code>,
+while the second parameter is the key, here <code>yo</code>. Now those are the parameters for the <code>get</code> trap but
+there are multiple others you can use!</p> <h2 id="lazy-proxy"><a href="#lazy-proxy" class="header-anchor">#</a> Lazy proxy</h2> <p>What I'd like to do is a proxy that can dynamically resolve its target without having to specify it,
+for example something like:</p> <div class="language-typescript extra-class"><pre class="language-typescript"><code><span class="token keyword">const</span> <span class="token function-variable function">serviceProvider</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> service <span class="token operator">=</span> somePlace<span class="token punctuation">.</span><span class="token function">getMyService</span><span class="token punctuation">(</span><span class="token string">'myService'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> service<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Here the proxy is empty, it doesn't know its target</span>
+<span class="token keyword">const</span> proxy <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">LazyProxy</span><span class="token punctuation">(</span>serviceProvider<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Here it should intercept this, resolve its target and forward to it</span>
+<span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>proxy<span class="token punctuation">.</span>abc<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div><p>My proxy will thus resolve its target only when necessary, which means that I can create my
+proxy earlier in time than my object. But more importantly, my proxy will act <strong>as</strong> the underlying
+object and loading it only when we try to do anything with it.</p> <p>My use case is that I'm developping a small dependency injection container, and injected services
+<em>might</em> not exist when I want to inject them. But instead, if I inject a LazyProxy which will resolve
+the service it's proxyfying and act like it once it's available, then it's a win.</p> <h2 id="possible-solution"><a href="#possible-solution" class="header-anchor">#</a> Possible solution</h2> <div class="language-typescript extra-class"><pre class="language-typescript"><code><span class="token keyword">class</span> <span class="token class-name">LazyProxy</span> <span class="token punctuation">{</span>
+
+    <span class="token comment">// We assume we're proxying over a javascript object</span>
+    <span class="token keyword">private</span> _instance<span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token punctuation">[</span>key<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">]</span><span class="token operator">:</span> <span class="token builtin">any</span> <span class="token punctuation">}</span> <span class="token operator">|</span> <span class="token keyword">null</span> <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="token keyword">private</span> <span class="token function-variable function">provider</span><span class="token operator">:</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span> <span class="token punctuation">[</span>key<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">]</span><span class="token operator">:</span> <span class="token builtin">any</span> <span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// keep a reference to this context, with access to get instance()</span>
+        <span class="token keyword">const</span> self <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// given target is irrelevant, we won't use it</span>
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span><span class="token punctuation">{</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+            <span class="token keyword">get</span><span class="token punctuation">(</span>_<span class="token punctuation">,</span> key<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">return</span> self<span class="token punctuation">.</span>instance<span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span><span class="token punctuation">,</span>
+
+            <span class="token comment">// add other traps...</span>
+        <span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token keyword">as</span> <span class="token builtin">any</span><span class="token punctuation">;</span> <span class="token comment">// type it as any otherwise it throws a typing error</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">get</span> <span class="token function">instance</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>_instance <span class="token operator">===</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>_instance <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">provider</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Load the service and keep it in cache</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span>_instance<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre></div><h3 id="returning-from-constructor"><a href="#returning-from-constructor" class="header-anchor">#</a> Returning from constructor</h3> <p>As you can see I opted for a <code>return new Proxy</code> inside my constructor, which means
+that the returned value from <code>new LazyProxy(...)</code> will actually be the proxy I created
+in it, but keeping track of the LazyProxy scope through the <code>self</code> variable, necessary
+to resolve the correct service in <code>get instance()</code>.</p> <p>This is necessary as explained <a href="https://stackoverflow.com/a/37714855/2514387" target="_blank" rel="noopener noreferrer">here<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a>, an ES2015
+class cannot extend from base Proxy class.</p> <p>This requires the <code>@ts-ignore</code> flag or doing a <code>as any</code> type conversion, otherwise we're
+messing with it and it will throw a type error.</p> <h2 id="example"><a href="#example" class="header-anchor">#</a> Example</h2> <div class="language-typescript extra-class"><pre class="language-typescript"><code><span class="token keyword">const</span> myObject <span class="token operator">=</span> <span class="token punctuation">{</span>hello<span class="token operator">:</span> <span class="token string">'world'</span><span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment">// this function generates my service</span>
+<span class="token keyword">const</span> <span class="token function-variable function">generator</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">(</span><span class="token punctuation">{</span> hello<span class="token operator">:</span> <span class="token string">'lazy world'</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// the generator is not called yet</span>
+<span class="token comment">// We need make typescript think it's dealing with the service</span>
+<span class="token keyword">const</span> lazyObject <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">LazyProxy</span><span class="token punctuation">(</span>generator<span class="token punctuation">)</span> <span class="token keyword">as</span> <span class="token builtin">any</span> <span class="token keyword">as</span> <span class="token punctuation">{</span> hello<span class="token operator">:</span> <span class="token builtin">string</span> <span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>myObject<span class="token punctuation">.</span>hello<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// world</span>
+
+<span class="token comment">// the generator is called and get(hello) is forwarded to the returned object</span>
+<span class="token builtin">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span>lazyObject<span class="token punctuation">.</span>hello<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// lazy world</span>
+</code></pre></div><h2 id="conclusion"><a href="#conclusion" class="header-anchor">#</a> Conclusion</h2> <p>And there we are with lazy proxies!</p></div> <footer class="page-edit"><!----> <!----></footer> <!----> </main></div><div class="global-ui"></div></div>
+    <script src="/assets/js/app.47846010.js" defer></script><script src="/assets/js/2.4afa1a45.js" defer></script><script src="/assets/js/10.bd030323.js" defer></script><script src="/assets/js/4.74cb3808.js" defer></script>
+  </body>
+</html>
